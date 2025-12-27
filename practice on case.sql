@@ -4,7 +4,7 @@ if (condition , true, false)
 if (conditon, true , if (condition, true, if)
 
 case:
-   when condition | expressio then output 
+   when condition | expression then output 
    when condition, then output
    end 
    True --> 1 

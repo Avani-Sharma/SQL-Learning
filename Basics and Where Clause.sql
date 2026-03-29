@@ -62,6 +62,35 @@ SELECT * FROM country WHERE Continent IN ('Asia', 'Africa');
 -- Ques9.--> Countries not Asia or Africa
 SELECT * FROM country WHERE Continent not IN ('Asia', 'Africa');
 
+-- Find countries whose continent is 'Asia' AND population > 1 crore
+select * from country where continent = 'Asia' and population > 10000000;
+
+-- Get countries whose region is 'Southern Europe' AND population < 50 lakh
+select * from country where region = 'Southern Europe' and population < 5000000;
+
+-- Find countries whose IndepYear > 1950 AND continent is 'Africa'
+select * from country where indepyear > 1950 and continent = 'Africa';
+
+-- Get countries whose population BETWEEN 10 lakh AND 1 crore AND continent is 'Europe'
+select * from country where population between 1000000 and 10000000 and continent = 'Europe';
+
+-- Find countries whose name starts with 'A' AND continent is not 'Asia'
+select * from country where name like 'A%' and continent != 'Asia';
+
+-- Get countries whose continent is 'Asia' OR 'Europe' AND population > 2 crore
+select * from country where (continent = 'Asia' OR continent = 'Europe') and population > 20000000;
+
+-- Find countries whose IndepYear is NULL AND population > 1 crore
+select * from country where indepyear is null and population > 10000000;
+
+-- Get countries whose region is 'Western Europe' AND name ends with 'y'
+select * from country where region = 'Western Europe' and name like '%y';
+
+-- Find countries whose population < 5 lakh AND continent is 'Oceania'
+select * from country where population <500000 and continent = 'Oceania';
+
+-- Get countries whose name contains 'land' AND population > 10 lakh
+select * from country where name like '%land%' and population > 1000000;
 
 CREATE TABLE students (
     id INT,

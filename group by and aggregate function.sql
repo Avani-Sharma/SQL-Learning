@@ -81,3 +81,37 @@ where staff_id = 1 or staff_id =2 group by month(payment_date);
 -- for each month and each year
 select extract(year from payment_date), count(customer_id) , avg(amount), sum(amount) from payment 
 where staff_id = 1 or staff_id =2 group by  extract(year from payment_date), extract(month from payment_date);
+
+create database saledb;
+use saledb;
+
+CREATE TABLE sales (
+    order_id INT,
+    customer_name VARCHAR(50),
+    product VARCHAR(50),
+    category VARCHAR(50),
+    amount INT,
+    city VARCHAR(50),
+    order_date DATE
+);
+
+INSERT INTO sales VALUES
+(1, 'Aman', 'Laptop', 'Electronics', 70000, 'Jaipur', '2024-01-10'),
+(2, 'Neha', 'Mobile', 'Electronics', 30000, 'Delhi', '2024-01-12'),
+(3, 'Rahul', 'Shoes', 'Fashion', 2000, 'Mumbai', '2024-01-15'),
+(4, 'Aman', 'Keyboard', 'Electronics', 1500, 'Jaipur', '2024-01-18'),
+(5, 'Pooja', 'Dress', 'Fashion', 3500, 'Delhi', '2024-01-20'),
+(6, 'Karan', 'Laptop', 'Electronics', 65000, 'Pune', '2024-01-22'),
+(7, 'Neha', 'Shoes', 'Fashion', 2500, 'Delhi', '2024-01-25'),
+(8, 'Rahul', 'Mobile', 'Electronics', 28000, 'Mumbai', '2024-01-28'),
+(9, 'Aman', 'Mouse', 'Electronics', 800, 'Jaipur', '2024-02-01'),
+(10, 'Pooja', 'Bag', 'Fashion', 2200, 'Delhi', '2024-02-05');
+
+-- Q1. Find the total sales for the Electronics category.
+select sum(amount) from sales where category = 'Electronics' ;
+
+-- Q2. Find the total purchase amount of customers from Delhi.
+select sum(amount) from sales where city = 'Delhi';
+
+-- Q3. Count the number of orders where amount > 3000, grouped by category.
+select category, count(*) from sales where amount > 3000 group by category;

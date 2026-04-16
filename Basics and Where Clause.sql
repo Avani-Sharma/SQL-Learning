@@ -1,11 +1,29 @@
--- to see all the database
-show databases;
+select current_user();
+show databases;         -- to show all the databases
+use sakila;
+show tables;            -- table in the databases
+
+select * from customer;
+-- 1 column access
+select customer_id from customer;
+-- 2 column access
+select customer_id , first_name from customer;
+
+select * from payment;
+select payment_id, amount from payment;
+
+select customer_id, first_name from customer;
+select customer_id, first_name, customer_id+10 from customer;    -- not seen changes in original 
+
+select customer_id, customer_id*10-1+6 from customer;
+select customer_id, CUSTOMER_id, cUstOMER_id from customer;     -- case insensitive
+
+-- where clause: to filter the rows 
+select * from customer where customer_id =4 ;
+select customer_id, first_name from customer where first_name = 'Maria';
 
 -- to utilize the database for which data will be stored
 use world;
-
--- to see the tables
-show tables;
 
 -- to see column of table country 
 describe country;

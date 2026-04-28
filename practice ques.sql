@@ -104,3 +104,7 @@ char_length(upper(LEFT(email, INSTR(email, '@') - 1))) as username_length
 from employees where char_length(upper(LEFT(email, INSTR(email, '@') - 1))) > 6 ;
 
 -- 15. Find active employees aged 30–38 (from birth_date) earning more than 65,000
+select emp_id, concat(first_name, ' ', last_name) as full_name, birth_date, 
+timestampdiff(year, birth_date, now()) as age ,  salary, department 
+from employees where is_Active = 'Y' and timestampdiff(year, birth_date, now()) between 30 and 38 and 
+salary > 65000;

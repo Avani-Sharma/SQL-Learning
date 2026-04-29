@@ -108,3 +108,124 @@ select emp_id, concat(first_name, ' ', last_name) as full_name, birth_date,
 timestampdiff(year, birth_date, now()) as age ,  salary, department 
 from employees where is_Active = 'Y' and timestampdiff(year, birth_date, now()) between 30 and 38 and 
 salary > 65000;
+
+
+-- more practice questions
+-- Find all employees who work in IT department.
+select * from employees where department = 'IT';
+
+-- Show employees whose salary is greater than 80,000.
+select emp_id, first_name, last_name, salary from employees where salary >80000;
+
+-- Find employees who are active (is_active = 'Y').
+select emp_id, first_name, last_name from employees where is_active = 'Y';
+
+-- List employees who live in New York or Chicago.
+select emp_id, first_name, last_name from employees where city in ('new york', 'chicago');
+
+-- Show employees from Sales department with salary < 60000.
+select emp_id, first_name, last_name from employees where department = 'Sales' and salary < 60000;
+
+-- Find employees whose job title is 'Sales Representative'.
+select emp_id, first_name, last_name from employees where job_title = 'sales representative';
+
+-- Show employees hired after 2020-01-01.
+select emp_id, first_name, last_name  from employees where hire_date > '2020-01-01';
+
+-- Find employees not working in HR department.
+select emp_id, first_name, last_name from employees where department != 'HR';
+
+-- Display full name using first_name + last_name.
+select concat_ws(' ', first_name, last_name) as full_name from employees;
+ 
+-- Show emails in uppercase.
+select upper(email) from employees;
+
+-- Extract first 3 characters of first_name.
+select left(first_name, 3) from employees;
+
+-- Find length of last_name.
+select char_length(last_name) from employees;
+
+-- Replace domain "@gmail.com" with "@company.com".
+select replace(email, '@gmail.com', '@company.com') from employees;
+
+-- Extract username from email (before @).
+select left(email, instr(email, '@') -1) from employees;
+
+-- Convert city names into lowercase.
+select lower(city) from employees;
+
+-- Find employees whose first_name starts with 'A' or 'J'.
+select first_name from employees where first_name like 'a%' or first_name like 'J%';
+
+-- Show employees with hire year only.
+SELECT emp_id, first_name, YEAR(hire_date) AS hire_year  FROM employees;
+
+-- Calculate age of employees from birth_date.
+SELECT emp_id, first_name,
+TIMESTAMPDIFF(YEAR, birth_date, now()) AS age
+FROM employees;
+
+-- Find employees hired in the year 2022.
+select emp_id, hire_date from employees where year(hire_date) = 2022;
+
+-- Show number of years an employee has worked in company.
+SELECT emp_id, first_name,
+TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) AS years_worked
+FROM employees;
+
+-- Find employees whose birthday is in March.
+SELECT emp_id, first_name, birth_date
+FROM employees
+WHERE MONTH(birth_date) = 3;
+
+-- Display current date minus hire_date (experience days).
+SELECT emp_id, first_name,
+TIMESTAMPDIFF(DAY, hire_date, CURDATE()) AS experience_days
+FROM employees;
+
+-- Show employees older than 30 years.
+SELECT emp_id, first_name, birth_date,
+TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) AS age
+FROM employees
+WHERE TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) > 30;
+
+-- Round all salaries to nearest integer.
+select round(salary) from employees;
+
+-- Show salary after adding 10% bonus.
+select salary+(salary*10/100) from employees;
+
+-- Find highest salary.
+select max(salary) from employees;
+
+-- Find lowest salary.
+select min(salary) from employees;
+
+-- Calculate average salary of IT department.
+select avg(salary) from employees where department = 'IT';
+
+-- Find total salary of all employees.
+select sum(salary) from employees;
+
+-- Show salary difference between highest and lowest salary.
+select max(salary)- min(salary) as salary_diff from employees;
+
+-- Display salary in thousands (salary / 1000).
+select salary, round(salary/1000, 2) from employees;
+
+-- Show full name + email + department of active IT employees.
+select concat(first_name, ' ', last_name) as full_name , email, department from employees 
+where department = 'IT' and is_active = 'Y';
+
+-- Find employees whose salary is between 60,000 and 90,000.
+select emp_id, first_name , salary from employees where salary between 60000 and 90000;
+
+-- Show employees whose name length > 5 and salary > 70000.
+select emp_id, first_name, char_length(first_name) , salary from employees 
+where char_length(first_name)>5 and salary >70000;
+
+-- Find employees hired before 2020 and still active.
+select emp_id, first_name, hire_date from employees 
+where year(hire_date) < 2020 and is_active = 'Y';

@@ -65,6 +65,6 @@ select * from address;
 select * from employees;
 select count(department), count(distinct department) from employees;
 
--- select salary, count(salary) from employees;   : error 
+-- select salary, count(salary) from employees;   : error no direct access 
 select sum(salary), count(salary) from employees;
 select max(salary), min(salary), avg(salary) from employees;

@@ -229,3 +229,73 @@ where char_length(first_name)>5 and salary >70000;
 -- Find employees hired before 2020 and still active.
 select emp_id, first_name, hire_date from employees 
 where year(hire_date) < 2020 and is_active = 'Y';
+
+-- Show full name and email of employees whose first_name starts with 'A' or 'M' and are active.
+select concat_ws(' ', first_name, last_name), email from employees where (first_name like 'A%'
+or first_name like 'M%') and is_active = 'Y';
+
+-- Find employees whose city contains 'San' and salary > 60000.
+select emp_id, first_name, city from employees where city like '%san%' and salary > 60000;
+
+-- Display employees whose email ends with 'gmail.com' and department is IT or HR.
+select emp_id, first_name, email, department from employees where
+email like '%gmail.com' and (department = 'IT' or department = 'HR');
+
+-- Show employees whose last_name length > 6 and are in Sales department.
+select emp_id, first_name, last_name from employees where char_length(last_name) > 6 and department = 'Sales';
+
+-- Find employees hired after 2019 and still active.
+select emp_id, first_name, last_name, hire_date from employees where year(hire_date) >2019 and 
+is_active = 'Y';
+
+-- Show employees whose birthday month is 6 or 12 and salary > 70000.
+select emp_id, first_name, last_name, birth_date from employees where 
+(month(birth_date) = '06' or month(birth_date) = '12') and salary > 70000;
+
+-- Find employees who joined in last 3 years and work in IT.
+select emp_id, first_name, last_name from employees where hire_date >= date_sub(current_Date(), interval 3 year)
+and department = 'IT';
+
+-- Display employees whose age is greater than 30 AND salary > 75000.
+select emp_id, first_name, last_name, timestampdiff(year, birth_date, now()) from employees 
+where timestampdiff(year, birth_date, now()) > 30 and salary>  75000;
+
+-- Find employees whose salary is between 50000 and 80000 and department is Marketing or Finance.
+select emp_id, first_name, last_name from employees where salary between 50000 and 80000 and 
+department in ('Marketing', 'Finance') ;
+
+-- Show employees whose salary after 10% bonus becomes > 90000.
+select emp_id, first_name, last_name, salary+(salary*10/100) as salary_bonus
+from employees where salary+(salary*10/100) > 90000 ;
+
+-- Find employees whose salary is not between 60000 and 90000.
+select emp_id, first_name, last_name, salary from employees where salary not between 60000 and 90000;
+
+-- Show employees whose name starts with 'J' or 'S', hired after 2020, and salary > 60000.
+select emp_id, first_name, last_name  from employees where (first_name like 'J%' or first_name like 'S%') and
+year(hire_date) >2020 and salary > 60000;
+
+-- Find employees whose email contains 'yahoo', joined before 2022, and are active.
+select emp_id, first_name, last_name, email from employees 
+where email like '%yahoo%' and year(hire_date)<2022 and is_active = 'Y';
+
+-- Display employees whose first_name length > 5, age < 35, and salary > 70000.
+select emp_id, first_name, last_name from employees
+where char_length(first_name)> 5 and 
+timestampdiff(year, birth_date, now()) <35 and
+salary > 70000;
+
+-- Find employees whose: city contains 'o' hired before 2021
+select emp_id, first_name, last_name from employees where city like '%o%' and year(hire_date) <2021;
+
+-- Show employees whose: age > 30 department is not HR salary increased after 10% bonus is > 80000
+select emp_id, first_name, last_name, salary from employees
+where timestampdiff(year, birth_date, now()) > 30
+and department != 'HR' and
+salary+(salary*10/100) > 80000;
+
+-- Find employees whose: email domain is gmail salary > 60000 experience > 3 years
+select emp_id, first_name, last_name, salary from employees
+where email like '%gmail%' and 
+salary >60000 and 
+timestampdiff(year, hire_date, now())>3;

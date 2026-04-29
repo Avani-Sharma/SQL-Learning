@@ -1,3 +1,4 @@
+use sakila;
 CREATE TABLE employees (
     emp_id       INT            PRIMARY KEY,
     first_name   VARCHAR(50)    NOT NULL,
@@ -13,7 +14,6 @@ CREATE TABLE employees (
     country      VARCHAR(50),
     is_active    CHAR(1)
 );
-
 
 INSERT INTO employees VALUES
 (1,  'Alice',  'Smith',    'alice.smith@gmail.com', 'IT',        'Software Engineer',    85000.00,'2019-03-15','1990-06-20','555-1001','New York',     'USA','Y'),
@@ -38,7 +38,6 @@ INSERT INTO employees VALUES
 (20, 'Tina',   'Walker',   'tina.w@outlook.com',    'HR',        'Training Manager',     69000.00,'2020-03-08','1988-12-03','555-1020','Baltimore',    'USA','Y'),
 (21, 'Uma',    'Hall',     'uma.h@gmail.com',       'Marketing', 'Brand Manager',        77000.00,'2018-10-17','1990-08-25','555-1021','Louisville',   'USA','N'),
 (22, 'Victor', 'Young',    'victor.y@yahoo.com',    'Sales',     'Sales Director',       98000.00,'2015-02-10','1980-03-07','555-1022','Portland',     'USA','Y');
-
 
 select * from employees;
 
@@ -107,7 +106,7 @@ from employees where char_length(upper(LEFT(email, INSTR(email, '@') - 1))) > 6 
 select emp_id, concat(first_name, ' ', last_name) as full_name, birth_date, 
 timestampdiff(year, birth_date, now()) as age ,  salary, department 
 from employees where is_Active = 'Y' and timestampdiff(year, birth_date, now()) between 30 and 38 and 
-salary > 65000;
+salary > 65000 ;
 
 
 -- more practice questions

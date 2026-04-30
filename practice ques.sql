@@ -298,3 +298,42 @@ select emp_id, first_name, last_name, salary from employees
 where email like '%gmail%' and 
 salary >60000 and 
 timestampdiff(year, hire_date, now())>3;
+
+use sakila;
+select * from employees;
+-- Find the total salary paid per department.
+select department, sum(salary) from employees group by department;
+-- Find the number of employees in each department.
+select department, count(emp_id) from employees group by department;
+-- first 3 characters of each employee name in capital letters
+select upper(left(first_name, 3))  from employees ;
+-- Find the employee who have more than 5 character in their name
+select emp_id, first_name, last_name  
+from employees where char_length(first_name) > 5;
+-- Find employees who joined after November 2020.
+select emp_id, first_name, last_name from employees where hire_date > '2020-11-30';
+-- Display the number of years since joining (assuming current year = 2025).
+select 2025-year(hire_date)  from employees;
+-- Display salary rounded to nearest thousand.
+select round(salary, -3) from employees;
+-- Find cities having more than 2 employees.
+SELECT city, COUNT(*) AS total_employees
+FROM employees
+GROUP BY city
+HAVING COUNT(*) > 2;
+-- Find cities where the average salary is between 60,000 and 75,000.
+SELECT city, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY city
+HAVING AVG(salary) BETWEEN 60000 AND 75000;
+-- Find the department and city combination where the average salary is highest.
+SELECT department, city, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department, city
+ORDER BY avg_salary DESC
+LIMIT 1;
+-- Display departments where more than one city is present.
+SELECT department, COUNT(DISTINCT city) AS total_cities
+FROM employees
+GROUP BY department
+HAVING COUNT(DISTINCT city) > 1;

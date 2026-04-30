@@ -115,3 +115,51 @@ select sum(amount) from sales where city = 'Delhi';
 
 -- Q3. Count the number of orders where amount > 3000, grouped by category.
 select category, count(*) from sales where amount > 3000 group by category;
+
+-- null : no value 
+use sakila;
+select * from employees;
+select count(salary), sum(salary) , avg(salary) from employees;
+select sum(salary) from employees where department = 'IT';
+select sum(salary), count(salary) from employees where department = 'Finance';
+
+-- group by : is a statement which is used to group similar values so that we can perform calculation on that group
+
+select department, count(department) from employees group by department;
+select department, sum(Salary) from employees group by department;
+select job_title, sum(salary) from employees group by job_title;
+
+select * from payment;
+-- from this payment table find the total amount and the average amount 
+select sum(amount), avg(amount) from payment;
+
+-- find the no. of transaction done by customer id 1
+select count(customer_id) from payment where customer_id = 1;
+
+-- find the total transaction done by customer id 2 or 5
+select count(*) from payment where customer_id in (2, 5);
+
+-- find the avg amount spend in the year 2005
+select avg(amount) from payment where year(payment_date) = 2005;
+
+-- find the total transaction done by each customer_id
+select customer_id , count(*) from payment group by customer_id;
+
+-- find total transaction and total amount spend after customer_id 3 
+select count(*) , sum(amount) from payment where customer_id > 3;
+
+-- find the occurence for each amount values
+select amount, count(amount) from payment group by amount;
+
+-- find the total amount given in your data 
+select sum(amount) from payment;
+
+-- get the avg amount spend by each staff 
+select staff_id, avg(amount) from payment group by staff_id;
+
+-- get the total amount spend in each month 
+select month(payment_date) , sum(amount) from payment group by month(payment_date);
+
+-- get the total amount spend for each month of each year 
+select year(payment_date) , month(payment_date), sum(amount) 
+from payment group by year(payment_date) ,month(payment_date) ;

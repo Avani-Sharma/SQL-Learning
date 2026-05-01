@@ -337,3 +337,38 @@ SELECT department, COUNT(DISTINCT city) AS total_cities
 FROM employees
 GROUP BY department
 HAVING COUNT(DISTINCT city) > 1;
+
+
+-- sakila database 
+use sakila;
+show tables;
+-- Display the first name, last name, and email of customers whose first name starts with 'A'. 
+-- Sort them by last name in ascending order.
+select first_name, last_name,email from customer where first_name like 'A%' order by last_name asc;
+
+-- Find the top 10 highest payment amounts made in the year 2005. Show customer ID, amount, and payment date.
+select customer_id, amount, payment_Date
+from payment where year(payment_date) = 2005 order by payment_date desc limit 10 ;
+
+-- Display the number of customers in each store. Only show stores having more than 250 customers.
+select store_id, count(*) from customer group by store_id having count(*) > 250;
+
+-- Find all actors whose last name contains the letter 'S'. Display their names in uppercase and sort by first name.
+select upper(first_name), upper(last_name ) from actor where last_name like  '%s%' order by first_name ;
+
+-- Show the total payment collected by each staff member. Display only those staff members 
+-- whose total collection exceeds 30,000.
+select staff_id, sum(amount) from payment group by staff_id having sum(amount)>30000 ;
+
+-- List the unique movie ratings available in the film table, sorted alphabetically.
+select distinct(rating) from film order by rating asc;
+
+-- Find the top 5 longest movie titles along with their length.
+select title, char_length(title) from film order by char_length(title) desc limit 5;
+
+-- Display the number of films released in each rating category. Only include categories having more than 200 films.
+select rating , count(*) from film group by rating having count(*) > 200;
+
+-- Find customers whose email domain is 'sakilacustomer.org'. Display their full name and email.
+select concat_ws(' ', first_name, last_name), email from customer 
+where email like '%@sakilacustomer.org' ;

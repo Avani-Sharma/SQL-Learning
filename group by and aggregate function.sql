@@ -163,3 +163,10 @@ select month(payment_date) , sum(amount) from payment group by month(payment_dat
 -- get the total amount spend for each month of each year 
 select year(payment_date) , month(payment_date), sum(amount) 
 from payment group by year(payment_date) ,month(payment_date) ;
+
+-- practice 
+use sakila;
+select * from payment;
+select customer_id, count(*) from payment group by customer_id;
+
+select customer_id , count(*) from payment where customer_id >=3  group by customer_id;

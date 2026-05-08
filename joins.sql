@@ -65,4 +65,89 @@ right join orders on customers.customer_id = orders.customer_id;
 
 -- natural join: acts as a inner join based on the common column name 
 select customers.customer_id, customers.customer_name, orders.customer_id, orders.product_name from customers
-natural join orders
+natural join orders;
+
+
+-- practice sheet 
+-- Create employees table
+CREATE TABLE employees (
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(50),
+    dept_id INT
+);
+
+-- Insert data into employees table
+INSERT INTO employees (emp_id, emp_name, dept_id) VALUES
+(1, 'Alice', 10),
+(2, 'Bob', 20),
+(3, 'Charlie', 30),
+(4, 'Diana', 10),
+(5, 'Edward', NULL);
+
+
+-- Create departments table
+CREATE TABLE departments (
+    dept_id INT PRIMARY KEY,
+    dept_name VARCHAR(50)
+);
+
+-- Insert data into departments table
+INSERT INTO departments (dept_id, dept_name) VALUES
+(10, 'HR'),
+(20, 'IT'),
+(40, 'Finance');
+
+select * from employees;
+select * from departments;
+
+-- 1. List the names of all employees along with their department names. Show only employees who belong to a department.
+select  e.emp_name, d.dept_name
+from employees as e
+inner join departments as d
+on e.dept_id = d.dept_id;
+
+-- 2. List ALL employees with their department names. If an employee has no department, show NULL for department name.
+select e.emp_name, d.dept_name 
+from employees as e
+left join departments as d 
+on e.dept_id = d.dept_id;
+
+-- 3. Show all departments and the number of employees in each. Include departments with ZERO employees.
+SELECT d.dept_name,
+COUNT(e.emp_id) AS employee_count
+FROM employees e
+RIGHT JOIN departments d
+ON e.dept_id = d.dept_id
+GROUP BY d.dept_name;
+
+-- 4. Display employee names along with their department names.
+select e.emp_name, d.dept_name
+from employees as e
+ inner join departments as d
+on e.dept_id = d.dept_id;
+
+-- 5. Show all employees who belong to a valid department.
+select e.emp_name , d.dept_name
+from employees as e
+inner join departments as d
+on e.dept_id = d.dept_id;
+
+-- 6. Retrieve employee id, employee name, and department name
+select e.emp_id, e.emp_name, d.dept_name
+from employees as e
+inner join departments as d
+on e.dept_id = d.dept_id;
+
+-- 7. Count the number of employees in each department.
+select d.dept_id, count(e.emp_id) 
+from employees as e
+join departments as d
+on e.dept_id = d.dept_id
+group by d.dept_id;
+
+-- 8. Display department names with total employees.
+select d.dept_id, count(e.emp_id) 
+from employees as e
+join departments as d
+on e.dept_id = d.dept_id
+group by d.dept_id;

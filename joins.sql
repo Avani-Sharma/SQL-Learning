@@ -67,7 +67,6 @@ right join orders on customers.customer_id = orders.customer_id;
 select customers.customer_id, customers.customer_name, orders.customer_id, orders.product_name from customers
 natural join orders;
 
-
 -- practice sheet 
 -- Create employees table
 CREATE TABLE employees (

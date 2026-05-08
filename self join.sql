@@ -104,4 +104,36 @@ from employees as empl
 join employees as mngr
 where empl.manager_id = mngr.emp_id;
 
+-- find that employees has whose department is same as of the manager
+select e.emp_id, e.emp_name, e.manager_id, e.department, m.emp_id, m.emp_name, m.department
+from employees as e join employees as m
+where e.manager_id = m.emp_id and e.department = m.department;
 
+-- find the employees name an its salary if it is greater than the salary manager
+select e.emp_id, e.emp_name, e.manager_id, m.emp_id, m.emp_name, e.salary, m.salary
+from employees as e join employees as m
+where e.manager_id = m.emp_id and e.salary > m.salary;
+
+-- show all employee name with all the managers name
+select e.emp_id, e.emp_name, m.emp_id, m.emp_name
+from employees as e join employees as m
+where e.manager_id = m.emp_id;
+
+-- show employee and its grandmanager -------- employee, manager, grandmanager
+select 
+    e.emp_name as employee,
+    m.emp_name as manager,
+    g.emp_name as grandmanager
+from employees as e
+join employees as m
+on e.manager_id = m.emp_id
+join employees as g
+on m.manager_id = g.emp_id;
+
+-- find employees who are also managers -------- emp_id , emp_name
+select distinct
+    e.emp_id,
+    e.emp_name
+from employees as e
+join employees as m
+on e.emp_id = m.manager_id;

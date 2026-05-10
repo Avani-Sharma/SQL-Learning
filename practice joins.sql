@@ -184,14 +184,34 @@ join film as f
 on fa.film_id = f.film_id;
 
 -- 3. find actor_id, actor_name, and the movie he has worked
-select a.actor_id, a.first_name 
+select a.actor_id, concat_ws(' ', a.first_name, a.last_name) as actor_name, f.title as movie_name 
 from actor as a
 join film_actor as fa 
 on a.actor_id = fa.actor_id 
-join film_actor as fa
+join film as f
 on fa.film_id = f.film_id;
 
 -- 4. get actor_id, actor_name, only for the movie whose length is greater than 120 
+select a.actor_id, concat_ws(' ', a.first_name, a.last_name) as actor_name, f.title , f.length
+from actor as a
+join film_actor as fa 
+on a.actor_id = fa.actor_id 
+join film as f
+on fa.film_id = f.film_id
+where f.length > 120;
 
 -- 5. get the actor_id, actor_name, and the total no of movies he has worked
+select a.actor_id, concat_ws(' ', a.first_name, a.last_name) as actor_name, count(f.title) as total_movies
+from actor as a
+join film_actor as fa 
+on a.actor_id = fa.actor_id 
+join film as f
+on fa.film_id = f.film_id
+group by actor_id, a.first_name, a.last_name;
+
 -- 6. get the film_title, and no. of actors that have worked on that film
+select f.title as film_title, count(fa.actor_id) as total_actors
+from film as f
+join film_actor as fa
+on f.film_id = fa.film_id
+group by f.title;

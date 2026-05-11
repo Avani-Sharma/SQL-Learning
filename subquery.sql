@@ -108,3 +108,15 @@ select film_id, title, rental_duration from film where rental_duration > (select
 -- rating should be same as of the movie apollo teen
 select film_id from film where release_year = (select release_year from film where title = 'alone trip') 
 and rating = (select rating from film where title ='apollo teen');
+
+-- multi row subquery : it returns multiple rows and don't use arithmetic operations 
+-- use operator: in , not in
+use shadidb;
+select * from biodata;
+
+select * from biodata where age in
+(select age from biodata where name ='anjali' or name = 'aishwarya') and name != 'Rahul';
+
+-- find the name for rahul where age is not equal to age of anjalai and aishwarya
+select * from biodata where age not in
+(select age from biodata where name ='anjali' or name = 'aishwarya') and name != 'Rahul';

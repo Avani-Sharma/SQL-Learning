@@ -61,3 +61,50 @@ select month(payment_date), sum(amount) from payment where month(payment_date)>6
 select month(payment_date), sum(amount) from payment where month(payment_date)> 
 (select month(payment_date) from payment where customer_id =1 and payment_id = 3)
  group by payment_date;
+ 
+
+create database shadidb;
+use shadidb;
+create table biodata(id int, name varchar(20), age int);
+insert into biodata values(1, 'Rahul', 28),
+                   (2, 'Anjali', 28),
+                   (3, 'Aishwarya', 40),
+                   (4, 'Naina', 23);
+                   
+-- types of subquery: single row subquery: it is a type of query in which inner query return only one row
+
+select * from biodata;
+select age from biodata where name = 'Rahul';  -- age of rahul
+select * from biodata where age = 28; 
+
+select * from biodata where age = (select age from biodata where name = 'Rahul'); 
+
+select max(age) from biodata;
+select * from biodata where age = 40;
+
+select * from biodata where age = (select max(age) from biodata);
+
+select char_length(name) from biodata where name = 'Rahul';
+select name, char_length(name) from biodata ;
+
+select name from biodata where char_length(name) = (select char_length(name) from biodata where name = 'Rahul');
+
+use sakila;
+select * from film;
+
+-- find movies where the rental rate is same for the movie of african egg 
+select rental_rate from film where title = 'african egg';
+select title, rental_rate from film where rental_Rate = 2.99;
+
+select title, rental_rate from film where rental_Rate = (select rental_rate from film where title = 'african egg');
+
+-- get the movie_id , movie_name where the rental_rate is equal to minimum rental_rate
+select film_id, title, rental_rate from film where rental_rate = (select min(rental_rate) from film);
+
+-- get movie_id, movie_name, duration, where the duration is greater than avg duration of the movies
+select film_id, title, rental_duration from film where rental_duration > (select avg(rental_duration) from film);
+
+-- get movie_id, for the movies where the release year of movie should be equal to alone trip and 
+-- rating should be same as of the movie apollo teen
+select film_id from film where release_year = (select release_year from film where title = 'alone trip') 
+and rating = (select rating from film where title ='apollo teen');

@@ -129,3 +129,8 @@ salary > ( select avg(salary) from employees where department = e.department);
 select * from employees;
 select * from employees as e where 
 salary = ( select max(salary) from employees where department = e.department);
+
+-- find department where all employees earn above 70000
+select * from employees as e where 
+70000 <all(select salary from employees where department = e.department);
+

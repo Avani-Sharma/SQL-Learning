@@ -23,8 +23,9 @@ select * from actor_cp;
 -- in case if you have any executed ddl statement then you can't rollback 
 -- object means a structure to manage , store or refer the data 
 
--- windows function: 
--- is used to perform the calculation on set of rows
+-- windows function: is a type of function is used to perform the calculation on set of rows 
+-- it perform a calculation on multiple rows and gives calculated the output 
+-- it perform a calulation across a set of rows related to current row without collapsing 
 -- are used to apply with reference to current row
 
 -- window functions are majorly have 3 parts: 
@@ -52,3 +53,28 @@ sum(population) over(partition by continent) from country;
 -- running sum, cummulative sum 
 select code, name, continent, population,
 sum(population) over(order by population) from country;
+
+
+use shadidb;
+select * from employees;
+select avg(salary) from employees;
+select emp_id, name, salary, avg(salary) over() from employees ;
+
+select emp_id, name, salary, max(salary) over(), 
+avg(salary) over() from employees ;
+
+select emp_id, name, salary, avg(salary) over(), salary-avg(salary) over()  from employees ;
+
+select emp_id, name, count(*) over(), max(salary) over(), min(salary) over(), avg(salary) over() from employees;
+
+select emp_id, name, salary, sum(salary) over(), 
+concat(round((salary/sum(salary) over())*100), '%') from employees;
+
+-- running sum/cumulative sum/total sum:
+select emp_id, name, salary, sum(salary) over(order by salary) from employees;
+
+select emp_id, name, salary, sum(salary) over(order by emp_id desc) from employees;
+
+select emp_id, name, salary, sum(salary) over(order by department) from employees;
+
+

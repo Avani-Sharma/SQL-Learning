@@ -160,3 +160,47 @@ select *, rank() over() from employees;
 select *, rank() over(order by salary) from employees;
 
 select *, rank() over(partition by dept order by salary desc) from employees;
+
+select *, row_number() over(order by salary) ,
+rank() over(order by salary),
+dense_rank() over(order by salary) from employees;
+
+-- rank, dense_rank == order by compulsory
+select *, rank() over(partition by dept order by salary) ,
+dense_rank() over(partition by dept order by salary) from employees;
+
+select *, rank() over(partition by dept order by hire_year) ,
+dense_rank() over(partition by dept order by hire_year) from employees;
+
+select * from employees as e 
+where salary = (select max(salary) from employees where dept = e.dept);
+
+-- where clause: sbse phle execute hota h or only un rows p kam krta h jo table m phle se exist krti h 
+-- max, rank
+select * from
+(select *, max(salary) over(partition by dept) as deptSalary from employees) as trh 
+where salary = deptSalary;
+
+select *, rank() over(partition by dept order by salary desc) `rank` from employees;
+
+select * from 
+(select *, rank() over(partition by dept order by salary desc) `rank` from employees) as temp
+where `rank` = 1;
+
+-- person with second highest salary
+select * from 
+(select *, dense_rank() over(order by salary desc) as drnk from employees) as tem
+where drnk = 2;
+
+-- in interviews don't use order by , limit for second highest salary
+select * from employees where salary =
+(select max(salary) from employees where salary <(select max(salary) from employees));
+
+-- second highest salary --> only use subquery
+select max(salary) from employees where salary < (select max(salary) from employees);
+
+-- find out the fourth largest salary
+select * from  
+(select *, dense_rank() over(order by salary) as drnk from employees) as tem
+where drnk = 4;
+

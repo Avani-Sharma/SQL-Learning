@@ -204,4 +204,35 @@ select * from
 (select *, dense_rank() over(order by salary) as drnk from employees) as tem
 where drnk = 4;
 
- 
+
+create database rjdb;
+
+use rjdb;
+
+CREATE TABLE sales (
+    id INT,
+    sale_date DATE,
+    amount INT
+);
+
+INSERT INTO sales VALUES
+(1, '2026-01-01', 100),
+(2, '2026-01-02', 200),
+(3, '2026-01-03', 300),
+(4, '2026-01-04', 400),
+(5, '2026-01-05', 500);
+
+select *, lag(sale_date,2) over() from sales;
+select *, lead(sale_date,1,0) over (order by amount desc) from sales;
+
+-- row between -> row between is a clause in windows function which is used to specify the range of rows
+-- syntax -> rows between <start_boundary> and <end_boundary>
+-- unbounded preceding means first row
+-- curent row means current row
+-- unbounded following means last row
+select *, sum(amount) over(rows between unbounded preceding and current row) from sales;
+select *, sum(amount) over(rows between 1 preceding and current row) from sales;
+select *, sum(amount) over(rows between 2 preceding and current row) from sales;
+select *, sum(amount) over(rows between unbounded preceding and 1 following) from sales;
+
+select sum(amount) over(order by sale_date rows between 1 preceding and current row) as prev_current_sum from sales;

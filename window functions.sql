@@ -204,3 +204,4 @@ select * from
 (select *, dense_rank() over(order by salary) as drnk from employees) as tem
 where drnk = 4;
 
+ 

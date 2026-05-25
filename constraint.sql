@@ -127,6 +127,8 @@ INSERT INTO class VALUES
 
 SELECT * FROM class;
 
+-- foreign key : A Foreign Key creates a relationship between two tables.
+-- It refers to the primary key of another table.
 
 CREATE TABLE student (
     id INT,

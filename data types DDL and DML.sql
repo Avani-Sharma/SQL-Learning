@@ -1,4 +1,4 @@
--- data types sql
+-- data types sql: define what kind of data can be stored in a table column.
 -- numbers: integer values, decimal values
 -- tinyint, smallint, mediumint, int, bigint
 -- 1 byte, 2 byte, 3 byte, 4 byte, 8 byte
@@ -77,3 +77,56 @@ update actor_cp set newsalary = 900;
 
 update actor_cp set newsalary = 888 where fname = 'UMA';
 select * from actor_cp;
+
+
+create database if not exists datatypedb;
+use datatypedb;
+
+-- numeric data type: int, float  
+-- tinyint --> 1 byte -->  store positive, negative values but in only range (-128 to 127)
+create table test1( id tinyint);
+insert into test1 values(-1) , (10);
+insert into test1 values(128);  -- out of range error (1 byte = 8 bit ==> 2**8 = 256 ==> (-128 to 127))
+select * from test1;
+
+-- smallint --> 2 byte
+-- mediumint --> 3 byte
+-- int --> 4 byte
+-- bigint --> 8 byte 
+create table test2( age tinyint unsigned);
+insert into test2 values (250);
+select * from test2;
+
+-- decimal values
+-- float : occupy 4 byte
+-- double : occupy 8 byte
+create table test3( salary float, salary2 double);
+insert into test3 values(1989.9301934, 1989.9301934);
+select * from test3;
+
+create table test4(price double(6,2)); -- total is 6, 2 is decimal value, 4 are the value before 
+insert into test4 values(0.756453424); -- only 2 decimal values
+insert into test4 values(44.34354534);
+insert into test4 values(4445.34354534);
+insert into test4 values(4443);
+insert into test4 values(44531); -- error --> 5 integer value 
+select * from test4; 
+
+-- string datatype
+-- char : fixed length/size character. Doesn't consider whitespace after word (before word it consider whitespace)
+-- char will truncate all the white space from the last 
+create table test5(countrycode char(3));
+insert into test5 values('Ind');
+insert into test5 values('india');   -- error
+insert into test5 values('he     '); 
+select * from test5;
+select *, char_length(countrycode) from test5;
+
+-- varchar : variable length character . no fixed size 
+-- varchar will have of white space upto the size of subcolumn
+create table test6(countrycode varchar(3));
+insert into test6 values('Ind');
+insert into test6 values('india');   -- error
+insert into test6 values('he     '); 
+select * from test6;
+select *, char_length(countrycode) from test6;

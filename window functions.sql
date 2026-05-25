@@ -221,7 +221,7 @@ INSERT INTO sales VALUES
 (3, '2026-01-03', 300),
 (4, '2026-01-04', 400),
 (5, '2026-01-05', 500);
-
+select * from sALES;
 select *, lag(sale_date,2) over() from sales;
 select *, lead(sale_date,1,0) over (order by amount desc) from sales;
 
@@ -233,6 +233,7 @@ select *, lead(sale_date,1,0) over (order by amount desc) from sales;
 select *, sum(amount) over(rows between unbounded preceding and current row) from sales;
 select *, sum(amount) over(rows between 1 preceding and current row) from sales;
 select *, sum(amount) over(rows between 2 preceding and current row) from sales;
+-- calculate the sum of current row and next row
 select *, sum(amount) over(rows between unbounded preceding and 1 following) from sales;
 
 select sum(amount) over(order by sale_date rows between 1 preceding and current row) as prev_current_sum from sales;

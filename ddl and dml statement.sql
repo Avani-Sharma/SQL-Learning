@@ -27,9 +27,18 @@ desc test12;
 
 -- add a column before a name column 
 -- change the datatype of name column to integer
-alter table test12 ;
 -- add a not null constraint to the name and age column
 -- add a foreign key of a column name as dept_id reference to dept_table
+create table test12 (name varchar(20));
+drop table test12;
+create table test12(name varchar(20));
+alter table test12 add column (age int);
+alter table test12 modify column name int;
+ALTER TABLE test12;
+select * from test12;
+insert into test12 values(null,12);
+
+
 
 select database();
 select * from sakila.actor;

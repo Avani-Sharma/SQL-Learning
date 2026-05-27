@@ -56,3 +56,67 @@ savepoint in_actor_cp;
 delete from actor_cp where actor_id in (5,1);
 rollback to in_actor_cp;
 select * from actor_cp;
+
+
+
+-- Transactions: A transaction is a group of SQL statements that work together as a single unit.
+-- TCL (Transaction Control Language): TCL commands are used to manage transactions in the database.
+-- TCL ensures data accuracy and reliability by following the ACID properties.
+-- 1. Atomicity:
+-- Either all operations of a transaction are completed successfully,
+-- or none of them are performed (all are rolled back).
+-- 2. Consistency:
+-- A transaction keeps the database in a valid and consistent state
+-- before and after execution.
+-- 3. Isolation:
+-- Multiple transactions execute independently without affecting each other.
+-- 4. Durability:
+-- Once a transaction is committed, the changes are permanently saved
+-- in the database even if a system failure occurs.
+
+use company;
+create table rjdb(id int);
+insert into rjdb values (10);
+select  * from rjdb;
+
+-- manage insert, update, delete use tcl
+start transaction;
+insert into rjdb values (100), (99);
+select * from rjdb;
+commit;
+
+-- Transaction Start:
+-- A transaction starts with the START TRANSACTION command
+-- or automatically when DML commands (INSERT, UPDATE, DELETE) are executed.
+-- Transaction End:
+-- A transaction ends by using COMMIT or ROLLBACK.
+-- It can also end automatically after executing DDL statements
+-- like CREATE, ALTER, DROP because they perform an implicit COMMIT.
+start transaction;
+update rjdb set id= 50;
+select * from rjdb;
+rollback;
+
+
+select * from rjdb;
+delete from rjdb;
+select * from rjdb;
+rollback;
+
+
+start transaction;
+insert into rjdb values(10), (100), (400);
+delete from rjdb where id = 10;
+select * from rjdb;
+commit;
+rollback;
+
+-- savepoint: to recover the data
+start transaction;
+insert into rjdb values(101), (120), (440);
+select * from rjdb;
+savepoint rjdb_savepoint_ds;
+update rjdb set id = 101;
+rollback to rjdb_savepoint_ds; -- rollback to savepoint to revert upto specific point 
+
+

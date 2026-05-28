@@ -48,26 +48,25 @@ grant update (id, name) on employee to avni;
 grant select(id) on testdb4.employee to avni;
 
 -- remove all the priviledge from this avni user 
-revoke all privileges on employee from avni;
-revoke all privileges on emp2 from avni;
+REVOKE ALL PRIVILEGES ON testdb.employee FROM 'avni'@'%';
+REVOKE ALL PRIVILEGES ON testdb.emp2 FROM 'avni'@'%';
 
--- create three users and create a group(roll) named as sales
--- give permission to roll --> select, insert, update
--- add 2 user to roll(group) to this particular roll
 -- login user and have permissions or not
-
+-- create three users and create a group(role) named as sales
 create user avani identified by '5678';
 create user rahul identified by '123';
 create user simran identified by '1234';
-
 create role sales;
+
+-- give permission to roll --> select, insert, update
 grant select, insert, update on employee to sales;
 
+-- add 2 user to roll(group) to this particular role
 grant sales to avani;
 grant sales to rahul;
 
 show grants for sales;
-
+-- login user and have permissions or not
 show grants for avani;
 show grants for rahul;
 show grants for simran;

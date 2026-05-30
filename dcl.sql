@@ -49,7 +49,7 @@ grant select(id) on testdb4.employee to avni;
 
 -- remove all the priviledge from this avni user 
 REVOKE ALL PRIVILEGES ON testdb.employee FROM 'avni'@'%';
-REVOKE ALL PRIVILEGES ON testdb.emp2 FROM 'avni'@'%';
+REVOKE ALL PRIVILEGES ON testdb.emp2 from 'avni'@'%';
 
 -- login user and have permissions or not
 -- create three users and create a group(role) named as sales

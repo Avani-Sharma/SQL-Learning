@@ -198,7 +198,7 @@ and emp_name <> 'Rachel King';
 -- Q5. List all products whose price is greater than the average price across all products in the entire products table.
 -- Show product_name, category, and price, ordered by price descending.
 select product_name, category, price from products  where price >
-(select avg(price) from products);
+(select avg(price) from products) order by price desc;
 
 -- Q6. Retrieve the product_id, product_name, category, and price of the single most expensive product in the entire
 -- products table.
@@ -341,15 +341,66 @@ select avg(amount) from orders where status = 'Delivered')order by amount desc;
 -- Q31. Using a correlated subquery, find all employees who earn more than the average salary of their own
 -- department. For each qualifying employee, also display their department's average salary (rounded to 2 decimal
 -- places). Order by department, then salary descending.
+SELECT 
+    e.emp_name,
+    e.department,
+    e.salary,
+    ROUND(
+        (SELECT AVG(e2.salary)
+         FROM employees e2
+         WHERE e2.department = e.department), 
+    2) AS dept_avg_salary
+FROM employees e
+WHERE e.salary >
+    (SELECT AVG(e2.salary)
+     FROM employees e2
+     WHERE e2.department = e.department)
+ORDER BY e.department, e.salary DESC;
 
 -- Q32. For every employee, use a correlated subquery to count how many other employees in the same department
 -- earn strictly more than them. Display emp_name, department, salary, and this count as 'higher_earners'. Order by
 -- department, salary descending.
+SELECT 
+    e.emp_name,
+    e.department,
+    e.salary,
+    (
+        SELECT COUNT(*)
+        FROM employees e2
+        WHERE e2.department = e.department
+          AND e2.salary > e.salary
+    ) AS higher_earners
+FROM employees e
+ORDER BY e.department, e.salary DESC;
 
 -- Q33. Using a correlated subquery inside the WHERE clause, find all customers whose total order spend (sum of all
 -- their order amounts) is greater than the average total spend per customer across all ordering customers. Display
 -- customer_id, customer_name, and total_spend. Order by total_spend descending. (Compute per-customer total and
 -- the overall average both via subqueries — no window functions.)
+SELECT 
+    c.customer_id,
+    c.customer_name,
+    (
+        SELECT SUM(o.amount)
+        FROM orders o
+        WHERE o.customer_id = c.customer_id
+    ) AS total_spend
+FROM customers c
+WHERE 
+    (
+        SELECT SUM(o.amount)
+        FROM orders o
+        WHERE o.customer_id = c.customer_id
+    ) >
+    (
+        SELECT AVG(customer_total)
+        FROM (
+            SELECT SUM(amount) AS customer_total
+            FROM orders
+            GROUP BY customer_id
+        ) t
+    )
+ORDER BY total_spend DESC;
 
 -- Q34. Using a subquery in the WHERE clause with IN and a GROUP BY / HAVING inside the subquery, find all
 -- employees who belong to departments where the average salary of the department is greater than 65,000. Return
@@ -361,10 +412,40 @@ order by department, salary desc;
 -- Q35. For every row in the orders table, use a correlated subquery inside a CASE expression to label each order as
 -- 'Above Avg' if its amount is greater than or equal to that customer's own average order amount, and 'Below Avg'
 -- otherwise. Show order_id, customer_id, amount, and the label as 'vs_cust_avg'. Order by customer_id, order_id.
+SELECT 
+    o.order_id,
+    o.customer_id,
+    o.amount,
+    CASE 
+        WHEN o.amount >= (
+            SELECT AVG(o2.amount)
+            FROM orders o2
+            WHERE o2.customer_id = o.customer_id
+        )
+        THEN 'Above Avg'
+        ELSE 'Below Avg'
+    END AS vs_cust_avg
+FROM orders o
+ORDER BY o.customer_id, o.order_id;
 
 -- Q36. Using a correlated subquery, find all products whose price is greater than the average price of other products
 -- in the same category. Display product_name, category, price, and the category average (rounded to 2 decimals) as
 -- 'cat_avg'. Order by category, price descending.
+SELECT 
+    p.product_name,
+    p.category,
+    p.price,
+    ROUND(
+        (SELECT AVG(p2.price)
+         FROM products p2
+         WHERE p2.category = p.category),
+    2) AS cat_avg
+FROM products p
+WHERE p.price >
+    (SELECT AVG(p2.price)
+     FROM products p2
+     WHERE p2.category = p.category)
+ORDER BY p.category, p.price DESC;
 
 -- Q37. Find all employees whose salary is greater than the salary of AT LEAST ONE employee in the Marketing
 -- department. Use ANY (or equivalently, > MIN of Marketing salaries). Return emp_name, department, and salary
@@ -384,10 +465,41 @@ order by salary desc;
 -- Q39. Find customers who have placed at least one order AND whose every order has status = 'Delivered' (i.e., they
 -- have no Cancelled or Pending orders). Use a combination of EXISTS and NOT EXISTS. Return customer_id and
 -- customer_name ordered by customer_id.
+SELECT 
+    c.customer_id,
+    c.customer_name
+FROM customers c
+WHERE EXISTS (
+    SELECT 1
+    FROM orders o
+    WHERE o.customer_id = c.customer_id
+)
+AND NOT EXISTS (
+    SELECT 1
+    FROM orders o
+    WHERE o.customer_id = c.customer_id
+      AND o.status <> 'Delivered'
+)
+ORDER BY c.customer_id;
 
 -- Q40. Using nested IN subqueries, find all products that were ordered by at least one customer from the city of
 -- Mumbai. First find customer_ids from Mumbai, then find product_ids ordered by those customers, then return the
 -- product details. Show product_id, product_name, and category, ordered by product_id.
+SELECT 
+    product_id,
+    product_name,
+    category
+FROM products
+WHERE product_id IN (
+    SELECT product_id
+    FROM orders
+    WHERE customer_id IN (
+        SELECT customer_id
+        FROM customers
+        WHERE city = 'Mumbai'
+    )
+)
+ORDER BY product_id;
 
 -- Q41. Find the employee(s) with the second-highest salary in the entire company. Use a subquery that first finds the
 -- maximum salary, then an outer query that finds the maximum salary below that value. Return emp_name,
@@ -406,65 +518,376 @@ order by e.department;
 -- Q43. Using a correlated subquery in the WHERE clause, find all customers who have placed orders for at least 2
 -- different products (i.e., their orders contain at least 2 distinct product_id values). Return customer_id and
 -- customer_name, ordered by customer_id.
+SELECT 
+    c.customer_id,
+    c.customer_name
+FROM customers c
+WHERE (
+    SELECT COUNT(DISTINCT o.product_id)
+    FROM orders o
+    WHERE o.customer_id = c.customer_id
+) >= 2
+ORDER BY c.customer_id;
 
 -- Q44. Using a correlated subquery, find all employees whose salary is above the average salary of all employees
 -- hired in the same year as them. Show emp_name, department, salary, hire_year, and the year's average (rounded to
 -- 2 dp) as 'year_avg'. Order by hire_year, salary descending.
+SELECT 
+    e.emp_name,
+    e.department,
+    e.salary,
+    e.hire_year,
+    ROUND(
+        (SELECT AVG(e2.salary)
+         FROM employees e2
+         WHERE e2.hire_year = e.hire_year),
+    2) AS year_avg
+FROM employees e
+WHERE e.salary >
+    (SELECT AVG(e2.salary)
+     FROM employees e2
+     WHERE e2.hire_year = e.hire_year)
+ORDER BY e.hire_year, e.salary DESC;
 
 -- Q45. Using a correlated subquery, find all products whose stock_qty is less than the average stock_qty of all
 -- products in the same category. Display product_name, category, stock_qty, and the category average stock rounded
 -- to 2 dp as 'cat_avg_stock'. Order by category, stock_qty ascending.
-
+SELECT 
+    p.product_name,
+    p.category,
+    p.stock_qty,
+    ROUND(
+        (SELECT AVG(p2.stock_qty)
+         FROM products p2
+         WHERE p2.category = p.category),
+    2) AS cat_avg_stock
+FROM products p
+WHERE p.stock_qty <
+    (SELECT AVG(p2.stock_qty)
+     FROM products p2
+     WHERE p2.category = p.category)
+ORDER BY p.category, p.stock_qty ASC;
 
 -- Q46. Find all employees whose salary is among the top 3 distinct salary values in the company. For example, if the
 -- top 3 distinct salaries are 82000, 80000, and 78000, return all employees earning any of those values. Use a subquery
 -- with LIMIT or a nested approach — no window functions.
-select emp_name, department, salary from employees where salary in (
-select distinct salary from employees order by salary desc)
-order by salary desc limit 3;
+SELECT emp_name, department, salary
+FROM employees
+WHERE salary IN (
+    SELECT DISTINCT salary
+    FROM employees
+    ORDER BY salary DESC
+    LIMIT 3
+)
+ORDER BY salary DESC;
 
 -- Q47. Find all customers (who have placed at least one order) where every single one of their orders has an amount
 -- strictly greater than 1,000. Customers with any order at or below 1,000 must be excluded. Use EXISTS and NOT
 -- EXISTS. Return customer_id and customer_name, ordered by customer_id.
+SELECT c.customer_id, c.customer_name
+FROM customers c
+WHERE EXISTS (
+    SELECT 1
+    FROM orders o
+    WHERE o.customer_id = c.customer_id
+)
+AND NOT EXISTS (
+    SELECT 1
+    FROM orders o
+    WHERE o.customer_id = c.customer_id
+      AND o.amount <= 1000
+)
+ORDER BY c.customer_id;
+
 -- Q48. For each department, find the employee whose salary is closest to that department's average salary
 -- (minimum absolute difference). If two employees are equally close, both should appear. Show emp_name,
 -- department, salary, dept_avg (rounded to 2 dp), and the difference (diff). Order by department.
+SELECT 
+    e.emp_name,
+    e.department,
+    e.salary,
+    ROUND(
+        (SELECT AVG(e2.salary)
+         FROM employees e2
+         WHERE e2.department = e.department),
+    2) AS dept_avg,
+    ABS(
+        e.salary - (
+            SELECT AVG(e2.salary)
+            FROM employees e2
+            WHERE e2.department = e.department
+        )
+    ) AS diff
+FROM employees e
+WHERE ABS(
+    e.salary - (
+        SELECT AVG(e2.salary)
+        FROM employees e2
+        WHERE e2.department = e.department
+    )
+) = (
+    SELECT MIN(ABS(e3.salary - (
+        SELECT AVG(e4.salary)
+        FROM employees e4
+        WHERE e4.department = e3.department
+    )))
+    FROM employees e3
+    WHERE e3.department = e.department
+)
+ORDER BY e.department;
+
 -- Q49. Find all customers (other than customer 201) who have ordered every product that customer 201 has
 -- ordered. Customer 201 (Aarav Mehta) has ordered product_ids 301, 302, and 304. A candidate customer must have
 -- ordered all three. Use a NOT EXISTS / EXCEPT approach. Return customer_id and customer_name ordered by
 -- customer_id. (With this dataset, the expected result is an empty set.)
+SELECT c.customer_id, c.customer_name
+FROM customers c
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM (
+        SELECT DISTINCT product_id
+        FROM orders
+        WHERE customer_id = 201
+    ) p
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM orders o
+        WHERE o.customer_id = c.customer_id
+          AND o.product_id = p.product_id
+    )
+)
+AND c.customer_id <> 201;
+
 -- Q50. Find all departments whose total salary bill is greater than the total salary bill of at least one other
 -- department (i.e., greater than the minimum department total). Show department and dept_total ordered by
 -- dept_total descending. Use a subquery in the HAVING clause.
+SELECT 
+    d.dept_name AS department,
+    SUM(e.salary) AS dept_total
+FROM departments d
+JOIN employees e ON e.department = d.dept_name
+GROUP BY d.dept_name
+HAVING SUM(e.salary) > (
+    SELECT MIN(dept_sum)
+    FROM (
+        SELECT SUM(e2.salary) AS dept_sum
+        FROM employees e2
+        GROUP BY e2.department
+    ) t
+)
+ORDER BY dept_total DESC;
+
 -- Q51. Using only subqueries (no self-join syntax), find all employees who earn strictly more than their own
 -- manager's salary. For each such employee, display emp_name, their salary as emp_salary, their manager's name as
 -- manager_name, and the manager's salary as manager_salary. Order by emp_salary descending.
+SELECT 
+    e.emp_name,
+    e.salary AS emp_salary,
+    (SELECT m.emp_name FROM employees m WHERE m.emp_id = e.manager_id) AS manager_name,
+    (SELECT m.salary FROM employees m WHERE m.emp_id = e.manager_id) AS manager_salary
+FROM employees e
+WHERE e.salary > (
+    SELECT m.salary
+    FROM employees m
+    WHERE m.emp_id = e.manager_id
+)
+ORDER BY e.salary DESC;
+
 -- Q52. Find all products whose total number of orders is greater than the average number of orders per product
 -- (across only those products that appear in at least one order). Use a correlated subquery to count each product's
 -- orders, and a non-correlated subquery to compute the average order count per product. Show product_id,
 -- product_name, and order_count.
+SELECT 
+    p.product_id,
+    p.product_name,
+    (
+        SELECT COUNT(*)
+        FROM orders o
+        WHERE o.product_id = p.product_id
+    ) AS order_count
+FROM products p
+WHERE (
+    SELECT COUNT(*)
+    FROM orders o
+    WHERE o.product_id = p.product_id
+) > (
+    SELECT AVG(cnt)
+    FROM (
+        SELECT COUNT(*) AS cnt
+        FROM orders
+        GROUP BY product_id
+    ) t
+);
+
 -- Q53. Find the customer(s) whose single highest order amount is equal to the global maximum order amount in the
 -- entire orders table. For each such customer, show customer_id, customer_name, and their best_order (maximum
 -- order amount). Use correlated scalar subqueries — no joins.
+SELECT 
+    c.customer_id,
+    c.customer_name,
+    (
+        SELECT MAX(o.amount)
+        FROM orders o
+        WHERE o.customer_id = c.customer_id
+    ) AS best_order
+FROM customers c
+WHERE (
+    SELECT MAX(o.amount)
+    FROM orders o
+    WHERE o.customer_id = c.customer_id
+) = (
+    SELECT MAX(amount) FROM orders
+);
+
 -- Q54. Find all employees who belong to departments that have a budget greater than the average budget across all
 -- departments in the departments table. Use a subquery with IN to identify qualifying departments, then retrieve
 -- employees. Show emp_name, department, and salary ordered by department and salary descending.
+SELECT emp_name, department, salary
+FROM employees
+WHERE department IN (
+    SELECT dept_name
+    FROM departments
+    WHERE budget > (
+        SELECT AVG(budget) FROM departments
+    )
+)
+ORDER BY department, salary DESC;
+
 -- Q55. For each customer who has placed at least one order, use a correlated subquery to count how many of their
 -- own orders have an amount strictly greater than their personal average order amount. Display customer_id,
 -- customer_name, and orders_above_avg. Order by orders_above_avg descending, then customer_id.
+SELECT 
+    c.customer_id,
+    c.customer_name,
+    (
+        SELECT COUNT(*)
+        FROM orders o
+        WHERE o.customer_id = c.customer_id
+          AND o.amount > (
+              SELECT AVG(o2.amount)
+              FROM orders o2
+              WHERE o2.customer_id = c.customer_id
+          )
+    ) AS orders_above_avg
+FROM customers c
+WHERE EXISTS (
+    SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id
+)
+ORDER BY orders_above_avg DESC, c.customer_id;
+
 -- Q56. Find all products that were ordered exclusively by customers from a single city (i.e., every customer who ever
 -- ordered that product is from the same city). Only consider products that appear in the orders table. Show
 -- product_id, product_name, and that single city as 'only_city'. With the current data, check whether any product
 -- meets this criterion.
+SELECT 
+    p.product_id,
+    p.product_name,
+    (
+        SELECT MIN(c.city)
+        FROM customers c
+        WHERE c.customer_id IN (
+            SELECT o.customer_id
+            FROM orders o
+            WHERE o.product_id = p.product_id
+        )
+        AND NOT EXISTS (
+            SELECT 1
+            FROM customers c2
+            JOIN orders o2 ON c2.customer_id = o2.customer_id
+            WHERE o2.product_id = p.product_id
+              AND c2.city <> (
+                  SELECT MIN(c3.city)
+                  FROM customers c3
+                  WHERE c3.customer_id IN (
+                      SELECT o3.customer_id
+                      FROM orders o3
+                      WHERE o3.product_id = p.product_id
+                  )
+              )
+        )
+    ) AS only_city
+FROM products p
+WHERE EXISTS (
+    SELECT 1 FROM orders o WHERE o.product_id = p.product_id
+);
+
 -- Q57. Find employees who are the sole highest earner in their department — meaning they earn the maximum
 -- salary in their department AND no other employee in that department earns the same amount. Show emp_name,
 -- department, and salary ordered by salary descending.
+SELECT emp_name, department, salary
+FROM employees e
+WHERE salary = (
+    SELECT MAX(salary)
+    FROM employees e2
+    WHERE e2.department = e.department
+)
+AND (
+    SELECT COUNT(*)
+    FROM employees e3
+    WHERE e3.department = e.department
+      AND e3.salary = e.salary
+) = 1
+ORDER BY salary DESC;
+
 -- Q58. Find customers whose total spend is more than double the average total spend per customer. Use a subquery
 -- to compute each customer's total spend and another to compute the average of those totals. Show customer_id,
 -- customer_name, and total_spend. With the current data, verify whether any customer meets this criterion.
+SELECT 
+    c.customer_id,
+    c.customer_name,
+    (
+        SELECT SUM(amount)
+        FROM orders o
+        WHERE o.customer_id = c.customer_id
+    ) AS total_spend
+FROM customers c
+WHERE (
+    SELECT SUM(amount)
+    FROM orders o
+    WHERE o.customer_id = c.customer_id
+) > 2 * (
+    SELECT AVG(total_spend)
+    FROM (
+        SELECT SUM(amount) AS total_spend
+        FROM orders
+        GROUP BY customer_id
+    ) t
+);
+
 -- Q59. Find the department that has the highest count of employees earning above the company-wide average
 -- salary. Use a correlated subquery to count above-average earners per department, and return only the top
 -- department. Show department and above_avg_count.
+SELECT department, above_avg_count
+FROM (
+    SELECT 
+        e.department,
+        (
+            SELECT COUNT(*)
+            FROM employees e2
+            WHERE e2.department = e.department
+              AND e2.salary > (
+                  SELECT AVG(salary) FROM employees
+              )
+        ) AS above_avg_count
+    FROM employees e
+    GROUP BY e.department
+) t
+ORDER BY above_avg_count DESC
+LIMIT 1;
+
 -- Q60. Find all employees who are the highest earner in their own department (salary = dept MAX) but whose
 -- overall salary rank in the company is beyond position 3 — meaning at least 3 other distinct salary values in the
 -- company are higher than theirs. Show emp_name, department, and salary ordered by salary descending.
+SELECT emp_name, department, salary
+FROM employees e
+WHERE salary = (
+    SELECT MAX(salary)
+    FROM employees e2
+    WHERE e2.department = e.department
+)
+AND (
+    SELECT COUNT(DISTINCT salary)
+    FROM employees e3
+    WHERE e3.salary > e.salary
+) >= 3
+ORDER BY salary DESC;

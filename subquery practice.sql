@@ -756,138 +756,64 @@ ORDER BY department, salary DESC;
 -- Q55. For each customer who has placed at least one order, use a correlated subquery to count how many of their
 -- own orders have an amount strictly greater than their personal average order amount. Display customer_id,
 -- customer_name, and orders_above_avg. Order by orders_above_avg descending, then customer_id.
-SELECT 
-    c.customer_id,
-    c.customer_name,
-    (
-        SELECT COUNT(*)
-        FROM orders o
-        WHERE o.customer_id = c.customer_id
-          AND o.amount > (
-              SELECT AVG(o2.amount)
-              FROM orders o2
-              WHERE o2.customer_id = c.customer_id
-          )
-    ) AS orders_above_avg
+select c.customer_id, c.customer_name, (
+select count(*) from orders o where o.customer_id = c.customer_id
+and o.amount > 
+( select avg (o2.amount) FROM orders o2 WHERE o2.customer_id = c.customer_id)) AS orders_above_avg
 FROM customers c
-WHERE EXISTS (
-    SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id
-)
+WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id)
 ORDER BY orders_above_avg DESC, c.customer_id;
 
 -- Q56. Find all products that were ordered exclusively by customers from a single city (i.e., every customer who ever
 -- ordered that product is from the same city). Only consider products that appear in the orders table. Show
 -- product_id, product_name, and that single city as 'only_city'. With the current data, check whether any product
 -- meets this criterion.
-SELECT 
-    p.product_id,
-    p.product_name,
-    (
-        SELECT MIN(c.city)
-        FROM customers c
-        WHERE c.customer_id IN (
-            SELECT o.customer_id
-            FROM orders o
-            WHERE o.product_id = p.product_id
-        )
-        AND NOT EXISTS (
-            SELECT 1
-            FROM customers c2
-            JOIN orders o2 ON c2.customer_id = o2.customer_id
-            WHERE o2.product_id = p.product_id
-              AND c2.city <> (
-                  SELECT MIN(c3.city)
-                  FROM customers c3
-                  WHERE c3.customer_id IN (
-                      SELECT o3.customer_id
-                      FROM orders o3
-                      WHERE o3.product_id = p.product_id
-                  )
-              )
-        )
-    ) AS only_city
-FROM products p
-WHERE EXISTS (
-    SELECT 1 FROM orders o WHERE o.product_id = p.product_id
-);
+select p.product_id, p.product_name, 
+(select min(c.city) from customers c
+	where c.customer_id in (
+select  o.customer_id from  orders o
+	where o.product_id = p.product_id)
+ and not exists (select 1
+	from customers c2 join orders o2 on c2.customer_id = o2.customer_id
+	where o2.product_id = p.product_id and c2.city <> (
+   select min(c3.city) from customers c3 where c3.customer_id in 
+(select o3.customer_id from orders o3 where o3.product_id = p.product_id)))) as only_city
+from products p where exists (
+ select 1 from orders o where o.product_id = p.product_id);
 
 -- Q57. Find employees who are the sole highest earner in their department — meaning they earn the maximum
 -- salary in their department AND no other employee in that department earns the same amount. Show emp_name,
 -- department, and salary ordered by salary descending.
-SELECT emp_name, department, salary
-FROM employees e
-WHERE salary = (
-    SELECT MAX(salary)
-    FROM employees e2
-    WHERE e2.department = e.department
-)
-AND (
-    SELECT COUNT(*)
-    FROM employees e3
-    WHERE e3.department = e.department
-      AND e3.salary = e.salary
-) = 1
-ORDER BY salary DESC;
+select emp_name, department, salary
+from employees e
+where salary = (select max(salary) from employees e2
+                 where e2.department = e.department)
+and (select count(*) from employees e3
+      where e3.department = e.department and e3.salary = e.salary) = 1
+order by salary desc;
 
 -- Q58. Find customers whose total spend is more than double the average total spend per customer. Use a subquery
 -- to compute each customer's total spend and another to compute the average of those totals. Show customer_id,
 -- customer_name, and total_spend. With the current data, verify whether any customer meets this criterion.
-SELECT 
-    c.customer_id,
-    c.customer_name,
-    (
-        SELECT SUM(amount)
-        FROM orders o
-        WHERE o.customer_id = c.customer_id
-    ) AS total_spend
-FROM customers c
-WHERE (
-    SELECT SUM(amount)
-    FROM orders o
-    WHERE o.customer_id = c.customer_id
-) > 2 * (
-    SELECT AVG(total_spend)
-    FROM (
-        SELECT SUM(amount) AS total_spend
-        FROM orders
-        GROUP BY customer_id
-    ) t
-);
+select c.customer_id, c.customer_name,
+(select sum(amount) from orders o where o.customer_id = c.customer_id) as total_spend
+from customers c
+where (select sum(amount) from orders o where o.customer_id = c.customer_id) > 2 * 
+(select avg(total_spend) from (select sum(amount) as total_spend from orders
+group by  customer_id) t);
 
 -- Q59. Find the department that has the highest count of employees earning above the company-wide average
 -- salary. Use a correlated subquery to count above-average earners per department, and return only the top
 -- department. Show department and above_avg_count.
-SELECT department, above_avg_count
-FROM (
-    SELECT 
-        e.department,
-        (
-            SELECT COUNT(*)
-            FROM employees e2
-            WHERE e2.department = e.department
-              AND e2.salary > (
-                  SELECT AVG(salary) FROM employees
-              )
-        ) AS above_avg_count
-    FROM employees e
-    GROUP BY e.department
-) t
-ORDER BY above_avg_count DESC
-LIMIT 1;
+select department, above_avg_count from (select  e.department,
+(select count(*) from employees e2 where e2.department = e.department and e2.salary > 
+(select avg(salary) from employees)) as above_avg_count from employees e group by e.department) t
+order by above_avg_count desc limit 1;
 
 -- Q60. Find all employees who are the highest earner in their own department (salary = dept MAX) but whose
 -- overall salary rank in the company is beyond position 3 — meaning at least 3 other distinct salary values in the
 -- company are higher than theirs. Show emp_name, department, and salary ordered by salary descending.
-SELECT emp_name, department, salary
-FROM employees e
-WHERE salary = (
-    SELECT MAX(salary)
-    FROM employees e2
-    WHERE e2.department = e.department
-)
-AND (
-    SELECT COUNT(DISTINCT salary)
-    FROM employees e3
-    WHERE e3.salary > e.salary
-) >= 3
-ORDER BY salary DESC;
+select emp_name, department, salary from employees e where salary = 
+(select max(salary) from employees e2 where e2.department = e.department)
+and (select count(distinct salary) from employees e3 where e3.salary > e.salary) >= 3
+order by salary desc;

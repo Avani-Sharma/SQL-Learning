@@ -95,26 +95,6 @@ This repository contains my SQL practice files, assignments, and exercises cover
 
 ---
 
-## 📂 Repository Structure
-
-```
-SQL-Practice/
-│── Basics and WHERE Clause
-│── Operators and Functions
-│── GROUP BY & Aggregate Functions
-│── JOINs
-│── Subqueries
-│── Common Table Expressions (CTE)
-│── Window Functions
-│── Views
-│── Indexes
-│── Constraints
-│── DDL, DML, DCL & TCL
-│── SQLZoo Practice
-│── Assignments
-│── Extra Practice Questions
-```
-
 ---
 
 ## 🎯 Learning Objectives
